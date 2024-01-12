@@ -3,8 +3,10 @@ from torch.utils.data import Dataset
 
 
 class CustomDataset(Dataset):
-    def __init__(self, ):
+    def __init__(self, split='train', train_ratio=0.7, val_ratio=0.15, test_ratio=0.15):
         super(CustomDataset).__init__()
+        self.split = split
+        assert train_ratio + val_ratio + test_ratio == 1, "The sum of the ratios must be 1"
 
     def __getitem__(self, index):
         # Dummy data for now
