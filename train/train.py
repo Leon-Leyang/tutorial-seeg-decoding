@@ -21,7 +21,3 @@ def train(model, optimizer, data_loader, device):
 
         # Update weights
         optimizer.step()
-
-
-if __name__ == "__main__":
-    pass
