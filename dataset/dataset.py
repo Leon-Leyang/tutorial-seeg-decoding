@@ -21,7 +21,7 @@ class CustomDataset(Dataset):
     def __getitem__(self, index):
         # Dummy data for now
         seeg = torch.rand(84, 1024)
-        label = torch.randint(0, 2, (1,))
+        label = torch.randint(0, 2, (1,)).float()
         return seeg, label
 
     def __len__(self):
