@@ -8,6 +8,16 @@ class CustomDataset(Dataset):
         self.split = split
         assert train_ratio + val_ratio + test_ratio == 1, "The sum of the ratios must be 1"
 
+        # Dummy data for now
+        total_num = 10000
+
+        if self.split == 'train':
+            self.total_num = int(total_num * train_ratio)
+        elif self.split == 'val':
+            self.total_num = int(total_num * val_ratio)
+        elif self.split == 'test':
+            self.total_num = int(total_num * test_ratio)
+
     def __getitem__(self, index):
         # Dummy data for now
         seeg = torch.rand(84, 1024)
@@ -15,8 +25,7 @@ class CustomDataset(Dataset):
         return seeg, label
 
     def __len__(self):
-        # Dummy data for now
-        return 10000
+        return self.total_num
 
 
 if __name__ == "__main__":
