@@ -29,8 +29,8 @@ class CustomDataset(Dataset):
 
 
 if __name__ == "__main__":
-    dataset = CustomDataset()
-    print(f'The dataset has {len(dataset)} samples')
+    dataset = CustomDataset(split='train')
+    print(f'The training dataset has {len(dataset)} samples')
 
     print("Checking the shape of the data...")
     for idx in range(len(dataset)):
@@ -38,3 +38,9 @@ if __name__ == "__main__":
         assert data[0].shape == (84, 1024), "The sEEG data must be of shape (84, 1024)"
         assert data[1].shape == (1,), "The label must be of shape (1,)"
     print("The shape of the data is correct")
+
+    dataset = CustomDataset(split='val')
+    print(f'The validation dataset has {len(dataset)} samples')
+
+    dataset = CustomDataset(split='test')
+    print(f'The test dataset has {len(dataset)} samples')
