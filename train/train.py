@@ -1,0 +1,27 @@
+import torch.nn.functional as F
+from tqdm import tqdm
+
+
+def train(model, optimizer, data_loader, device):
+    model.train()
+
+    for seeg, label in tqdm(data_loader):
+        seeg = seeg.to(device)
+        label = label.to(device)
+
+        # Forward
+        pred = model(seeg)
+
+        # Compute loss
+        loss = F.binary_cross_entropy(pred, label)
+
+        # Backward
+        optimizer.zero_grad()
+        loss.backward()
+
+        # Update weights
+        optimizer.step()
+
+
+if __name__ == "__main__":
+    pass
