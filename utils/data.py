@@ -2,7 +2,10 @@ import bz2
 import numpy as np
 import _pickle as pickle
 from tqdm import tqdm
-
+import os
+import numpy as np
+import cv2
+import xml.etree.ElementTree as ET
 
 def preprocess_seeg():
     chapter_start_end_timestep = get_start_end_timestep_4_chapters()
@@ -61,7 +64,110 @@ def get_start_end_timestep_4_chapters():
 
     return chapter_start_end_timestep
 
+def getDuration(filepath):
+
+    # Open the video file
+    cap = cv2.VideoCapture(filepath)
+
+    # Check if video opened successfully
+    if not cap.isOpened():
+        print("Error: Could not open video.")
+    else:
+        # Get the total number of frames in the video
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        # Get the frames per second (FPS)
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        # Calculate the duration of the video in seconds
+        duration_seconds = total_frames / fps
+     
+        cap.release()
+        return total_frames
+def getFrameTotal():
+    file_list = sorted(os.listdir("/media/data_cifs_lrs/projects/prj_tutorial_seeg-decoding/green_book_movie"))
+    filtered_file_list = [f for f in file_list if f.endswith("avi") and f != ".DS_Store"]
+
+    frame_total=[]
+    for f in filtered_file_list:
+        
+        filepath= "/media/data_cifs_lrs/projects/prj_tutorial_seeg-decoding/green_book_movie/"+f
+
+        
+        total_frames = getDuration(filepath)
+        frame_total.append(total_frames)
+    return frame_total
+def getXMLfiles():
+    foldername ="/media/data_cifs_lrs/projects/prj_tutorial_seeg-decoding/greenbook/raw/face/"
+    xml_file_list = sorted(os.listdir(foldername))
+    xml_files =[]
+    for f in xml_file_list :
+        xml_files.append("/media/data_cifs_lrs/projects/prj_tutorial_seeg-decoding/greenbook/raw/face/"+f)
+    return xml_files
+
+def extract_tony_frames(xml_file, frame_offset):
+    tree = ET.parse(xml_file)
+    root = tree.getroot()
+
+    tony_frames = []
+    for box in root.findall('.//box'):
+        character = box.find('attribute[@name="character"]')
+        if character is not None and character.text == "Tony":
+            frame = int(box.get('frame')) + frame_offset
+            if frame not in tony_frames:
+                tony_frames.append(frame)
+    return sorted(tony_frames)
+
+#
+
+def create_tony_frames():
+    # Total frames in each XML file
+    total_frames_each_file =  getFrameTotal()
+    xml_files =  getXMLfiles()
+    # Calculate the accumulated frame count
+    tony_frames_dict = {}
+    frame_offset = 0
+    for index, (xml_file, total_frames) in enumerate(zip(xml_files, total_frames_each_file)):
+        tony_frames = extract_tony_frames(xml_file, frame_offset)
+        tony_frames_dict[index] = tony_frames
+        frame_offset += total_frames
+    combined_frames = []
+    for key in tony_frames_dict:
+        combined_frames.extend(tony_frames_dict[key])
+
+    return combined_frames
+
+
+# Function to create a list indicating which seconds contain Tony
+def seconds_with_tony(frames_list, frames_per_second):
+    # Create a dictionary to count frames of Tony in each second
+    frame_count_per_second = {}
+    for frame in frames_list:
+        second = frame // frames_per_second
+        frame_count_per_second[second] = frame_count_per_second.get(second, 0) + 1
+
+    # Initialize an empty list for the final output
+    seconds_with_tony_list = [0] * (total_frames // frames_per_second + 1)
+
+    # Mark the seconds with more than 10 frames of Tony as 1
+    for second, count in frame_count_per_second.items():
+        if count > 10:
+            seconds_with_tony_list[second] = 1
+
+    return seconds_with_tony_list
+
+
+
 
 if __name__ == "__main__":
     seeg = preprocess_seeg()
     np.save("../data/seeg.npy", seeg)
+    # Video frame length and frames per second
+    total_frames = 234267
+    frames_per_second = 30
+
+    # List of frame numbers that contain the character Tony
+    frames_with_tony = create_tony_frames()
+   
+    seconds_with_tony_array = seconds_with_tony(frames_with_tony,30)
+    np.save("../data/seconds_with_tony.npy", seconds_with_tony_array )
+
+
