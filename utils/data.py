@@ -7,6 +7,7 @@ import numpy as np
 import cv2
 import xml.etree.ElementTree as ET
 
+
 def preprocess_seeg():
     chapter_start_end_timestep = get_start_end_timestep_4_chapters()
 
@@ -64,6 +65,7 @@ def get_start_end_timestep_4_chapters():
 
     return chapter_start_end_timestep
 
+
 def getDuration(filepath):
 
     # Open the video file
@@ -82,6 +84,8 @@ def getDuration(filepath):
      
         cap.release()
         return total_frames
+
+
 def getFrameTotal():
     file_list = sorted(os.listdir("/media/data_cifs_lrs/projects/prj_tutorial_seeg-decoding/green_book_movie"))
     filtered_file_list = [f for f in file_list if f.endswith("avi") and f != ".DS_Store"]
@@ -95,6 +99,8 @@ def getFrameTotal():
         total_frames = getDuration(filepath)
         frame_total.append(total_frames)
     return frame_total
+
+
 def getXMLfiles():
     foldername ="/media/data_cifs_lrs/projects/prj_tutorial_seeg-decoding/greenbook/raw/face/"
     xml_file_list = sorted(os.listdir(foldername))
@@ -102,6 +108,7 @@ def getXMLfiles():
     for f in xml_file_list :
         xml_files.append("/media/data_cifs_lrs/projects/prj_tutorial_seeg-decoding/greenbook/raw/face/"+f)
     return xml_files
+
 
 def extract_tony_frames(xml_file, frame_offset):
     tree = ET.parse(xml_file)
@@ -116,12 +123,12 @@ def extract_tony_frames(xml_file, frame_offset):
                 tony_frames.append(frame)
     return sorted(tony_frames)
 
-#
 
 def create_tony_frames():
     # Total frames in each XML file
-    total_frames_each_file =  getFrameTotal()
-    xml_files =  getXMLfiles()
+    total_frames_each_file = getFrameTotal()
+    xml_files = getXMLfiles()
+
     # Calculate the accumulated frame count
     tony_frames_dict = {}
     frame_offset = 0
@@ -153,8 +160,6 @@ def seconds_with_tony(frames_list, frames_per_second):
             seconds_with_tony_list[second] = 1
 
     return seconds_with_tony_list
-
-
 
 
 if __name__ == "__main__":
