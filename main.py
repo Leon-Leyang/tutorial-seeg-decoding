@@ -22,7 +22,7 @@ def main(args):
     # Create datasets
     print('Initializing datasets...')
     seeg_file = './data/seeg.npy'
-    label_file = './data/label.npy'
+    label_file = './data/label_20.npy'
     train_ratio = 0.7
     test_ratio = 0.15
     train_dataset = CustomDataset(seeg_file=seeg_file, label_file=label_file, split='train', train_ratio=train_ratio,
@@ -67,7 +67,7 @@ def get_args():
     parser = argparse.ArgumentParser(description='Train a model on sEEG data')
     parser.add_argument('--batch_size', type=int, default=32, help='Batch size')
     parser.add_argument('--lr', type=float, default=1e-3, help='Learning rate')
-    parser.add_argument('--epochs', type=int, default=50, help='Number of epochs')
+    parser.add_argument('--epochs', type=int, default=10, help='Number of epochs')
     parser.add_argument('--seed', type=int, default=42, help='Random seed')
     args = parser.parse_args()
     return args
