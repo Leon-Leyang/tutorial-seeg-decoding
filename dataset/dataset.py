@@ -40,6 +40,8 @@ class CustomDataset(Dataset):
             self.seeg_data = seeg_data[train_num + test_num:, :, :]
             self.label_data = label_data[train_num + test_num:]
 
+        print(f'Initialized {split} dataset with {self.total_num} samples')
+
     def __getitem__(self, index):
         seeg = torch.from_numpy(self.seeg_data[index, :, :]).float()
         label = torch.tensor([self.label_data[index]]).float()
