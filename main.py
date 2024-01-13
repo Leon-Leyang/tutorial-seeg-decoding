@@ -20,9 +20,11 @@ def main(args):
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
     # Create datasets
-    train_dataset = CustomDataset(split='train')
-    val_dataset = CustomDataset(split='val')
-    test_dataset = CustomDataset(split='test')
+    seeg_file = './data/seeg.npy'
+    label_file = './data/label.npy'
+    train_dataset = CustomDataset(seeg_file=seeg_file, label_file=label_file, split='train')
+    val_dataset = CustomDataset(seeg_file=seeg_file, label_file=label_file, split='val')
+    test_dataset = CustomDataset(seeg_file=seeg_file, label_file=label_file, split='test')
 
     # Create data loaders
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
@@ -36,6 +38,8 @@ def main(args):
 
     # Train
     for epoch in range(args.epochs):
+        print(f'\nEpoch {epoch}')
+
         train(model, optimizer, train_loader, device)
 
         # Evaluate on validation set

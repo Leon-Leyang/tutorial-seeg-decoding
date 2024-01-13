@@ -1,5 +1,4 @@
 import torch
-from tqdm import tqdm
 
 
 def eval(model, data_loader, device, split):
@@ -9,7 +8,7 @@ def eval(model, data_loader, device, split):
     correct = 0
 
     with torch.no_grad():
-        for seeg, label in tqdm(data_loader):
+        for seeg, label in data_loader:
             seeg = seeg.to(device)
             label = label.to(device)
 

@@ -1,11 +1,10 @@
 import torch.nn.functional as F
-from tqdm import tqdm
 
 
 def train(model, optimizer, data_loader, device):
     model.train()
 
-    for seeg, label in tqdm(data_loader):
+    for seeg, label in data_loader:
         seeg = seeg.to(device)
         label = label.to(device)
 
