@@ -1,27 +1,48 @@
+import numpy as np
 import torch
 from torch.utils.data import Dataset
 
 
 class CustomDataset(Dataset):
-    def __init__(self, split='train', train_ratio=0.7, val_ratio=0.15, test_ratio=0.15):
+    def __init__(self, seeg_file='../data/seeg.npy', label_file='../data/label.npy', split='train', train_ratio=0.7,
+                 test_ratio=0.15):
         super(CustomDataset).__init__()
         self.split = split
-        assert train_ratio + val_ratio + test_ratio == 1, "The sum of the ratios must be 1"
+        assert train_ratio + test_ratio <= 1, "The sum of train_ratio and test_ratio must be less than or equal to 1"
 
-        # Dummy data for now
-        total_num = 10000
+        # Load the data
+        seeg_data = np.load(seeg_file).transpose(1, 0)
+        label_data = np.load(label_file)
 
+        # The valid time is the minimum of time in seconds of the sEEG data and the label data
+        valid_time = min(int(seeg_data.shape[0] / 1024), label_data.shape[0])
+
+        # Truncate the data
+        seeg_data = seeg_data[:valid_time * 1024, :].reshape(-1, 84, 1024)  # Reshape to (valid_time, 84, 1024)
+        label_data = label_data[:valid_time]    # Reshape to (valid_time,)
+
+        # Compute the number of samples for each split
+        train_num = int(valid_time * train_ratio)
+        test_num = int(valid_time * test_ratio)
+        val_num = valid_time - train_num - test_num
+
+        # Split the data
         if self.split == 'train':
-            self.total_num = int(total_num * train_ratio)
-        elif self.split == 'val':
-            self.total_num = int(total_num * val_ratio)
+            self.total_num = train_num
+            self.seeg_data = seeg_data[:train_num, :, :]
+            self.label_data = label_data[:train_num]
         elif self.split == 'test':
-            self.total_num = int(total_num * test_ratio)
+            self.total_num = test_num
+            self.seeg_data = seeg_data[train_num:train_num + test_num, :, :]
+            self.label_data = label_data[train_num:train_num + test_num]
+        elif self.split == 'val':
+            self.total_num = val_num
+            self.seeg_data = seeg_data[train_num + test_num:, :, :]
+            self.label_data = label_data[train_num + test_num:]
 
     def __getitem__(self, index):
-        # Dummy data for now
-        seeg = torch.rand(84, 1024)
-        label = torch.randint(0, 2, (1,)).float()
+        seeg = torch.from_numpy(self.seeg_data[index, :, :]).float()
+        label = torch.tensor([self.label_data[index]]).float()
         return seeg, label
 
     def __len__(self):
@@ -29,7 +50,10 @@ class CustomDataset(Dataset):
 
 
 if __name__ == "__main__":
-    dataset = CustomDataset(split='train')
+    seeg_file = '../data/seeg.npy'
+    label_file = '../data/label.npy'
+
+    dataset = CustomDataset(seeg_file=seeg_file, label_file=label_file, split='train')
     print(f'The training dataset has {len(dataset)} samples')
 
     print("Checking the shape of the data...")
