@@ -48,7 +48,7 @@ def main(args):
         if val_acc > best_val_acc:
             best_val_acc = val_acc
             torch.save(model.state_dict(), f'./ckpt/best_{model.__class__.__name__}.pth')
-            print(f'Saved best model with validation accuracy {best_val_acc:.3f} in epoch {epoch}')
+            print(f'Saved best model in epoch {epoch}')
 
     # Evaluate on test set
     model.load_state_dict(torch.load(f'./ckpt/best_{model.__class__.__name__}.pth'))
