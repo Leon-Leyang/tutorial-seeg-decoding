@@ -7,7 +7,7 @@ from dataset.dataset import CustomDataset
 from torch.utils.data import DataLoader
 from train.train import train
 from eval.eval import eval
-from utils.utils import set_seeds
+from utils.model import set_seeds
 
 
 def main(args):
