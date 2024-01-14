@@ -24,5 +24,5 @@ def eval(model, data_loader, device, split):
 
     # Compute accuracy
     acc = correct / total
-    print(f'{split} Accuracy: {acc:.3f}')
+    print(f'{split} accuracy: {acc * 100:.2f}%')
     return acc

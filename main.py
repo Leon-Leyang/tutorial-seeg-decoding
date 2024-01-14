@@ -20,11 +20,17 @@ def main(args):
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
     # Create datasets
+    print('Initializing datasets...')
     seeg_file = './data/seeg.npy'
-    label_file = './data/label.npy'
-    train_dataset = CustomDataset(seeg_file=seeg_file, label_file=label_file, split='train')
-    val_dataset = CustomDataset(seeg_file=seeg_file, label_file=label_file, split='val')
-    test_dataset = CustomDataset(seeg_file=seeg_file, label_file=label_file, split='test')
+    label_file = './data/label_20.npy'
+    train_ratio = 0.7
+    test_ratio = 0.15
+    train_dataset = CustomDataset(seeg_file=seeg_file, label_file=label_file, split='train', train_ratio=train_ratio,
+                                  test_ratio=test_ratio)
+    val_dataset = CustomDataset(seeg_file=seeg_file, label_file=label_file, split='val', train_ratio=train_ratio,
+                                test_ratio=test_ratio)
+    test_dataset = CustomDataset(seeg_file=seeg_file, label_file=label_file, split='test', train_ratio=train_ratio,
+                                 test_ratio=test_ratio)
 
     # Create data loaders
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
@@ -37,9 +43,11 @@ def main(args):
     best_val_acc = 0
 
     # Train
+    print('\nTraining...')
     for epoch in range(args.epochs):
         print(f'\nEpoch {epoch}')
 
+        # Train for one epoch
         train(model, optimizer, train_loader, device)
 
         # Evaluate on validation set
@@ -47,9 +55,10 @@ def main(args):
         if val_acc > best_val_acc:
             best_val_acc = val_acc
             torch.save(model.state_dict(), f'./ckpt/best_{model.__class__.__name__}.pth')
-            print(f'Saved best model with validation accuracy {best_val_acc:.3f} in epoch {epoch}')
+            print(f'Saved best model in epoch {epoch}')
 
     # Evaluate on test set
+    print('\nTesting...')
     model.load_state_dict(torch.load(f'./ckpt/best_{model.__class__.__name__}.pth'))
     eval(model, test_loader, device, 'Test')
 
