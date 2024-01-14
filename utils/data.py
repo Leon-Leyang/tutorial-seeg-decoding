@@ -162,17 +162,37 @@ def seconds_with_tony(frames_list, frames_per_second):
     return seconds_with_tony_list
 
 
+def get_chars_freq(dataset):
+    """
+    Function to calculate the frequency of each character in the dataset
+    :param dataset: The dataset object
+    :return: The frequency of each character in the dataset
+    """
+    label_data = dataset.label_data
+    total_frames = label_data.shape[0]
+    frames_with_chars = np.sum(label_data, axis=0)
+    chars_freq = frames_with_chars / total_frames
+    return chars_freq
+
+
 if __name__ == "__main__":
-    seeg = preprocess_seeg()
-    np.save("../data/seeg.npy", seeg)
-    # Video frame length and frames per second
-    total_frames = 234267
-    frames_per_second = 30
+    # seeg = preprocess_seeg()
+    # np.save("../data/seeg.npy", seeg)
+    #
+    # # Video frame length and frames per second
+    # total_frames = 234267
+    # frames_per_second = 30
+    #
+    # # List of frame numbers that contain the character Tony
+    # frames_with_tony = create_tony_frames()
+    #
+    # seconds_with_tony_array = seconds_with_tony(frames_with_tony, 30)
+    # np.save("../data/seconds_with_tony.npy", seconds_with_tony_array)
 
-    # List of frame numbers that contain the character Tony
-    frames_with_tony = create_tony_frames()
-   
-    seconds_with_tony_array = seconds_with_tony(frames_with_tony,30)
-    np.save("../data/seconds_with_tony.npy", seconds_with_tony_array )
+    from dataset.dataset import CustomDataset
+    seeg_file = '../data/seeg.npy'
+    label_folder = '../data/presence_of_faces'
 
+    train_dataset = CustomDataset(seeg_file=seeg_file, label_folder=label_folder, split='train')
+    chars_freq = get_chars_freq(train_dataset)
 
