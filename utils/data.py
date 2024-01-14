@@ -162,6 +162,69 @@ def seconds_with_tony(frames_list, frames_per_second):
     return seconds_with_tony_list
 
 
+def extract_character_frames(xml_file, frame_offset,character_name):
+    tree = ET.parse(xml_file)
+    root = tree.getroot()
+
+    tony_frames = []
+    for box in root.findall('.//box'):
+        character = box.find('attribute[@name="character"]')
+        if character is not None and character.text == character_name:
+            frame = int(box.get('frame')) + frame_offset
+            if frame not in tony_frames:
+                tony_frames.append(frame)
+    return sorted(tony_frames)
+
+#
+
+def create_character_frames(character_name):
+    # Total frames in each XML file
+    total_frames_each_file =  getFrameTotal()
+    xml_files =  getXMLfiles()
+    # Calculate the accumulated frame count
+    tony_frames_dict = {}
+    frame_offset = 0
+    for index, (xml_file, total_frames) in enumerate(zip(xml_files, total_frames_each_file)):
+        tony_frames = extract_character_frames(xml_file, frame_offset,character_name)
+        tony_frames_dict[index] = tony_frames
+        frame_offset += total_frames
+    combined_frames = []
+    for key in tony_frames_dict:
+        combined_frames.extend(tony_frames_dict[key])
+
+    return combined_frames
+# Function to create a list indicating which seconds contain Tony
+def seconds_with_character(frames_list, frames_per_second,threshold):
+    # Create a dictionary to count frames of Tony in each second
+    frame_count_per_second = {}
+    for frame in frames_list:
+        second = frame // frames_per_second
+        frame_count_per_second[second] = frame_count_per_second.get(second, 0) + 1
+
+    # Initialize an empty list for the final output
+    seconds_with_tony_list = [0] * (total_frames // frames_per_second + 1)
+
+    # Mark the seconds with more than 10 frames of Tony as 1
+    for second, count in frame_count_per_second.items():
+        if count > threshold:
+            seconds_with_tony_list[second] = 1
+
+    return seconds_with_tony_list
+from collections import defaultdict
+
+def get_unique_characters(xml_files):
+    characters = set()
+
+    for xml_file in xml_files:
+        tree = ET.parse(xml_file)
+        root = tree.getroot()
+
+        for box in root.findall('.//box'):
+            character = box.find('attribute[@name="character"]')
+            if character is not None:
+                characters.add(character.text)
+    
+    return characters
 if __name__ == "__main__":
     seeg = preprocess_seeg()
     np.save("../data/seeg.npy", seeg)
@@ -169,10 +232,22 @@ if __name__ == "__main__":
     total_frames = 234267
     frames_per_second = 30
 
-    # List of frame numbers that contain the character Tony
-    frames_with_tony = create_tony_frames()
-   
-    seconds_with_tony_array = seconds_with_tony(frames_with_tony,30)
-    np.save("../data/seconds_with_tony.npy", seconds_with_tony_array )
+    xml_files=getXMLfiles()
+
+    # Get unique characters from the XML files
+    unique_characters = get_unique_characters(xml_files)
+    unique_characters_count = len(unique_characters)
+    
+    
+    for char in unique_characters:
+        print(char)
+
+        # List of frame numbers that contain the character 
+        frames_with_character = create_character_frames(char)
+        # Call the modified function with the combined list of frames
+        modified_seconds_with_character = seconds_with_character(frames_with_character,30,0)
+        modified_seconds_with_character[980:1000]  # Displaying the first 10 seconds as an example
+
+        np.save("seconds_with_"+char+"0.npy", modified_seconds_with_character )
 
 
