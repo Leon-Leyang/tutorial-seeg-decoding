@@ -4,11 +4,11 @@ import torch
 from torch.utils.data import Dataset
 
 
-class CustomDataset(Dataset):
+class MultiLabelDataset(Dataset):
     def __init__(self, seeg_file='../data/seeg.npy', label_folder='../data/presence_of_faces', split='train',
                  train_ratio=0.7, test_ratio=0.15,
                  chars_of_interest=['Amit', 'Dolores', 'Don', 'George', 'Kindell', 'Oleg', 'Tony']):
-        super(CustomDataset).__init__()
+        super(MultiLabelDataset).__init__()
         self.split = split
         assert train_ratio + test_ratio <= 1, "The sum of train_ratio and test_ratio must be less than or equal to 1"
 
@@ -65,7 +65,7 @@ if __name__ == "__main__":
     seeg_file = '../data/seeg.npy'
     label_folder = '../data/presence_of_faces'
 
-    dataset = CustomDataset(seeg_file=seeg_file, label_folder=label_folder, split='train')
+    dataset = MultiLabelDataset(seeg_file=seeg_file, label_folder=label_folder, split='train')
     print(f'The training dataset has {len(dataset)} samples')
 
     print("Checking the shape of the data...")
@@ -75,8 +75,8 @@ if __name__ == "__main__":
         assert data[1].shape == (7,), "The label must be of shape (7,)"
     print("The shape of the data is correct")
 
-    dataset = CustomDataset(split='val')
+    dataset = MultiLabelDataset(split='val')
     print(f'The validation dataset has {len(dataset)} samples')
 
-    dataset = CustomDataset(split='test')
+    dataset = MultiLabelDataset(split='test')
     print(f'The test dataset has {len(dataset)} samples')

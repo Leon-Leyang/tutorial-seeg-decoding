@@ -3,7 +3,7 @@ import argparse
 import torch
 import torch.optim as optim
 from models.fcnn import FCNN
-from dataset.dataset import CustomDataset
+from dataset.binary_label_dataset import BinaryLabelDataset
 from torch.utils.data import DataLoader
 from train.train import train
 from eval.eval import eval
@@ -25,12 +25,12 @@ def main(args):
     label_file = './data/label_20.npy'
     train_ratio = 0.7
     test_ratio = 0.15
-    train_dataset = CustomDataset(seeg_file=seeg_file, label_file=label_file, split='train', train_ratio=train_ratio,
-                                  test_ratio=test_ratio)
-    val_dataset = CustomDataset(seeg_file=seeg_file, label_file=label_file, split='val', train_ratio=train_ratio,
-                                test_ratio=test_ratio)
-    test_dataset = CustomDataset(seeg_file=seeg_file, label_file=label_file, split='test', train_ratio=train_ratio,
-                                 test_ratio=test_ratio)
+    train_dataset = BinaryLabelDataset(seeg_file=seeg_file, label_file=label_file, split='train', train_ratio=train_ratio,
+                                       test_ratio=test_ratio)
+    val_dataset = BinaryLabelDataset(seeg_file=seeg_file, label_file=label_file, split='val', train_ratio=train_ratio,
+                                     test_ratio=test_ratio)
+    test_dataset = BinaryLabelDataset(seeg_file=seeg_file, label_file=label_file, split='test', train_ratio=train_ratio,
+                                      test_ratio=test_ratio)
 
     # Create data loaders
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
