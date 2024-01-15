@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 from torch.utils.data import Dataset
+from sklearn.model_selection import train_test_split
 
 
 class BinaryLabelDataset(Dataset):
@@ -21,24 +22,31 @@ class BinaryLabelDataset(Dataset):
         seeg_data = seeg_data[:valid_time * 1024, :].reshape(-1, 84, 1024)  # Reshape to (valid_time, 84, 1024)
         label_data = label_data[:valid_time]    # Reshape to (valid_time,)
 
-        # Compute the number of samples for each split
+        # Compute the number of samples for train and test+val
         train_num = int(valid_time * train_ratio)
-        test_num = int(valid_time * test_ratio)
-        val_num = valid_time - train_num - test_num
+        test_val_num = valid_time - train_num
 
-        # Split the data
+        # Stratified split for train and test+val
+        seeg_train, seeg_test_val, label_train, label_test_val = train_test_split(
+            seeg_data, label_data, train_size=train_num, random_state=42, stratify=label_data)
+
+        # Further split test+val into test and val
+        test_num = int(test_val_num * (test_ratio / (1 - train_ratio)))
+        seeg_test, seeg_val, label_test, label_val = train_test_split(
+            seeg_test_val, label_test_val, train_size=test_num, random_state=42, stratify=label_test_val)
+
+        # Assign data based on split
         if self.split == 'train':
-            self.total_num = train_num
-            self.seeg_data = seeg_data[:train_num, :, :]
-            self.label_data = label_data[:train_num]
+            self.seeg_data = seeg_train
+            self.label_data = label_train
         elif self.split == 'test':
-            self.total_num = test_num
-            self.seeg_data = seeg_data[train_num:train_num + test_num, :, :]
-            self.label_data = label_data[train_num:train_num + test_num]
+            self.seeg_data = seeg_test
+            self.label_data = label_test
         elif self.split == 'val':
-            self.total_num = val_num
-            self.seeg_data = seeg_data[train_num + test_num:, :, :]
-            self.label_data = label_data[train_num + test_num:]
+            self.seeg_data = seeg_val
+            self.label_data = label_val
+
+        self.total_num = len(self.seeg_data)
 
         print(f'Initialized {split} dataset with {self.total_num} samples')
 
@@ -56,7 +64,6 @@ if __name__ == "__main__":
     label_file = '../data/presence_of_faces/seconds_with_Tony0.npy'
 
     dataset = BinaryLabelDataset(seeg_file=seeg_file, label_file=label_file, split='train')
-    print(f'The training dataset has {len(dataset)} samples')
 
     print("Checking the shape of the data...")
     for idx in range(len(dataset)):
@@ -65,8 +72,22 @@ if __name__ == "__main__":
         assert data[1].shape == (1,), "The label must be of shape (1,)"
     print("The shape of the data is correct")
 
+    labels = dataset.label_data
+    num_pos = np.sum(labels)
+    num_neg = len(labels) - num_pos
+    print(f'Number of positive samples: {num_pos}')
+    print(f'Number of negative samples: {num_neg}')
+
     dataset = BinaryLabelDataset(split='val')
-    print(f'The validation dataset has {len(dataset)} samples')
+    labels = dataset.label_data
+    num_pos = np.sum(labels)
+    num_neg = len(labels) - num_pos
+    print(f'Number of positive samples: {num_pos}')
+    print(f'Number of negative samples: {num_neg}')
 
     dataset = BinaryLabelDataset(split='test')
-    print(f'The test dataset has {len(dataset)} samples')
+    labels = dataset.label_data
+    num_pos = np.sum(labels)
+    num_neg = len(labels) - num_pos
+    print(f'Number of positive samples: {num_pos}')
+    print(f'Number of negative samples: {num_neg}')
