@@ -1,9 +1,9 @@
 import torch.nn as nn
 
 
-class FCNN(nn.Module):
+class BinaryLabelFCNN(nn.Module):
     def __init__(self):
-        super(FCNN, self).__init__()
+        super(BinaryLabelFCNN, self).__init__()
         self.fc1 = nn.Linear(84 * 1024, 128)
         self.bn1 = nn.BatchNorm1d(128)
         self.fc2 = nn.Linear(128, 64)
@@ -27,7 +27,7 @@ class FCNN(nn.Module):
 if __name__ == "__main__":
     import torch
 
-    model = FCNN()
+    model = BinaryLabelFCNN()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

@@ -2,7 +2,7 @@ import os
 import argparse
 import torch
 import torch.optim as optim
-from models.fcnn import FCNN
+from models.binary_label_fcnn import BinaryLabelFCNN
 from dataset.binary_label_dataset import BinaryLabelDataset
 from torch.utils.data import DataLoader
 from train.train import train
@@ -12,7 +12,7 @@ from utils.model import set_seeds
 
 def main(args):
     # Create model
-    model = FCNN()
+    model = BinaryLabelFCNN()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
 
