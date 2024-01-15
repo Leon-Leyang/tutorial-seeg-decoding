@@ -78,7 +78,6 @@ if __name__ == "__main__":
     print(f'Number of positive samples: {num_pos}')
     print(f'Number of negative samples: {num_neg}')
 
-
     dataset = BinaryLabelDataset(split='val')
     labels = dataset.label_data
     num_pos = np.sum(labels)
