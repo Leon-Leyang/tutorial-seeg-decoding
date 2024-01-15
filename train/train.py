@@ -1,7 +1,4 @@
-import torch.nn.functional as F
-
-
-def train(model, optimizer, data_loader, device):
+def train(model, optimizer, criterion, data_loader, device):
     model.train()
 
     total_loss = 0
@@ -14,7 +11,7 @@ def train(model, optimizer, data_loader, device):
         pred = model(seeg)
 
         # Compute loss
-        loss = F.binary_cross_entropy(pred, label)
+        loss = criterion(pred, label)
 
         # Backward
         optimizer.zero_grad()

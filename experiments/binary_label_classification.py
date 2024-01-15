@@ -2,6 +2,7 @@ import os
 import argparse
 import torch
 import torch.optim as optim
+import torch.nn.functional as F
 from models.binary_label_fcnn import BinaryLabelFCNN
 from dataset.binary_label_dataset import BinaryLabelDataset
 from torch.utils.data import DataLoader
@@ -18,6 +19,9 @@ def main(args):
 
     # Create optimizer
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
+
+    # Specify loss function
+    criterion = F.binary_cross_entropy
 
     # Create datasets
     print('Initializing datasets...')
@@ -48,7 +52,7 @@ def main(args):
         print(f'\nEpoch {epoch}')
 
         # Train for one epoch
-        train(model, optimizer, train_loader, device)
+        train(model, optimizer, criterion, train_loader, device)
 
         # Evaluate on validation set
         val_acc = eval(model, val_loader, device, 'Val')
