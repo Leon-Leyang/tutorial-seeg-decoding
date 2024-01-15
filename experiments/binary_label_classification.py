@@ -12,17 +12,6 @@ from utils.model import set_seeds
 
 
 def main(args):
-    # Create model
-    model = BinaryLabelFCNN()
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model.to(device)
-
-    # Create optimizer
-    optimizer = optim.Adam(model.parameters(), lr=args.lr)
-
-    # Specify loss function
-    criterion = F.binary_cross_entropy
-
     # Create datasets
     print('Initializing datasets...')
     seeg_file = '../data/seeg.npy'
@@ -40,6 +29,17 @@ def main(args):
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False)
     test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False)
+
+    # Create model
+    model = BinaryLabelFCNN()
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.to(device)
+
+    # Create optimizer
+    optimizer = optim.Adam(model.parameters(), lr=args.lr)
+
+    # Specify loss function
+    criterion = F.binary_cross_entropy
 
     # Create checkpoint directory
     os.makedirs('../ckpt', exist_ok=True)
