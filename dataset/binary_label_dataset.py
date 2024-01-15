@@ -77,7 +77,6 @@ if __name__ == "__main__":
     num_neg = len(labels) - num_pos
     print(f'Number of positive samples: {num_pos}')
     print(f'Number of negative samples: {num_neg}')
-    print(labels[:10])
 
 
     dataset = BinaryLabelDataset(split='val')
@@ -86,7 +85,6 @@ if __name__ == "__main__":
     num_neg = len(labels) - num_pos
     print(f'Number of positive samples: {num_pos}')
     print(f'Number of negative samples: {num_neg}')
-    print(labels[:10])
 
     dataset = BinaryLabelDataset(split='test')
     labels = dataset.label_data
@@ -94,5 +92,4 @@ if __name__ == "__main__":
     num_neg = len(labels) - num_pos
     print(f'Number of positive samples: {num_pos}')
     print(f'Number of negative samples: {num_neg}')
-    print(labels[:10])
 
