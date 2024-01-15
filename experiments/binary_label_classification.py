@@ -7,7 +7,7 @@ from models.binary_label_fcnn import BinaryLabelFCNN
 from dataset.binary_label_dataset import BinaryLabelDataset
 from torch.utils.data import DataLoader
 from train.train import train
-from eval.eval import eval
+from eval.eval import eval_binary_label_model
 from utils.model import set_seeds
 
 
@@ -55,7 +55,7 @@ def main(args):
         train(model, optimizer, criterion, train_loader, device)
 
         # Evaluate on validation set
-        val_acc = eval(model, val_loader, device, 'Val')
+        val_acc = eval_binary_label_model(model, val_loader, device, 'Val')
         if val_acc > best_val_acc:
             best_val_acc = val_acc
             torch.save(model.state_dict(), f'../ckpt/best_{model.__class__.__name__}.pth')
@@ -64,7 +64,7 @@ def main(args):
     # Evaluate on test set
     print('\nTesting...')
     model.load_state_dict(torch.load(f'../ckpt/best_{model.__class__.__name__}.pth'))
-    eval(model, test_loader, device, 'Test')
+    eval_binary_label_model(model, test_loader, device, 'Test')
 
 
 def get_args():

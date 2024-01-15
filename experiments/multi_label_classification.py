@@ -7,7 +7,7 @@ from models.multiple_label_fcnn import MultiLabelFCNN
 from dataset.multi_label_dataset import MultiLabelDataset
 from torch.utils.data import DataLoader
 from train.train import train
-from eval.eval import eval
+from eval.eval import eval_multi_label_model
 from utils.model import set_seeds
 from utils.data import get_chars_freq
 
@@ -49,7 +49,7 @@ def main(args):
     # Create checkpoint directory
     os.makedirs('../ckpt', exist_ok=True)
 
-    best_val_acc = 0
+    best_val_f1 = 0
 
     # Train
     print('\nTraining...')
@@ -59,17 +59,18 @@ def main(args):
         # Train for one epoch
         train(model, optimizer, criterion, train_loader, device)
 
-    #     # Evaluate on validation set
-    #     val_acc = eval(model, val_loader, device, 'Val')
-    #     if val_acc > best_val_acc:
-    #         best_val_acc = val_acc
-    #         torch.save(model.state_dict(), f'../ckpt/best_{model.__class__.__name__}.pth')
-    #         print(f'Saved best model in epoch {epoch}')
-    #
-    # # Evaluate on test set
-    # print('\nTesting...')
-    # model.load_state_dict(torch.load(f'../ckpt/best_{model.__class__.__name__}.pth'))
-    # eval(model, test_loader, device, 'Test')
+        # Evaluate on validation set
+        val_metrics = eval_multi_label_model(model, val_loader, device, 'Val')
+        val_f1 = val_metrics['f1']
+        if val_f1 > best_val_f1:
+            best_val_f1 = val_f1
+            torch.save(model.state_dict(), f'../ckpt/best_{model.__class__.__name__}.pth')
+            print(f'Saved best model in epoch {epoch}')
+
+    # Evaluate on test set
+    print('\nTesting...')
+    model.load_state_dict(torch.load(f'../ckpt/best_{model.__class__.__name__}.pth'))
+    eval_multi_label_model(model, test_loader, device, 'Test')
 
 
 def get_args():
