@@ -195,4 +195,12 @@ if __name__ == "__main__":
 
     train_dataset = MultiLabelDataset(seeg_file=seeg_file, label_folder=label_folder, split='train')
     chars_freq = get_chars_freq(train_dataset)
+    print(f'Training set character frequency: {chars_freq}')
 
+    val_dataset = MultiLabelDataset(seeg_file=seeg_file, label_folder=label_folder, split='val')
+    chars_freq = get_chars_freq(val_dataset)
+    print(f'Validation set character frequency: {chars_freq}')
+
+    test_dataset = MultiLabelDataset(seeg_file=seeg_file, label_folder=label_folder, split='test')
+    chars_freq = get_chars_freq(test_dataset)
+    print(f'Test set character frequency: {chars_freq}')
