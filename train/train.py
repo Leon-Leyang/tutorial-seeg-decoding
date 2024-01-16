@@ -22,4 +22,6 @@ def train(model, optimizer, criterion, data_loader, device):
 
         total_loss += loss.item()
 
-    print(f'Average loss: {total_loss / len(data_loader):.3f}')
+    avg_loss = total_loss / len(data_loader)
+    print(f'Train average loss per batch: {avg_loss:.3f}')
+    return avg_loss

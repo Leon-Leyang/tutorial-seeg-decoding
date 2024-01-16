@@ -3,6 +3,9 @@ import argparse
 import torch
 import torch.optim as optim
 import torch.nn.functional as F
+import matplotlib
+matplotlib.use('TkAgg')  # Example backend, change as needed
+import matplotlib.pyplot as plt
 from models.binary_label_fcnn import BinaryLabelFCNN
 from dataset.binary_label_dataset import BinaryLabelDataset
 from torch.utils.data import DataLoader
@@ -45,33 +48,49 @@ def main(args):
     os.makedirs('../ckpt', exist_ok=True)
 
     best_val_acc = 0
+    train_loss_list = []
+    val_loss_list = []
 
     # Train
     print('\nTraining...')
     for epoch in range(args.epochs):
-        print(f'\nEpoch {epoch}')
+        print(f'\nEpoch {epoch + 1}')
 
         # Train for one epoch
-        train(model, optimizer, criterion, train_loader, device)
+        train_loss = train(model, optimizer, criterion, train_loader, device)
+        train_loss_list.append(train_loss)
 
         # Evaluate on validation set
-        val_acc = eval_binary_label_model(model, val_loader, device, 'Val')
+        val_acc, val_loss = eval_binary_label_model(model, criterion, val_loader, device, 'Val')
         if val_acc > best_val_acc:
             best_val_acc = val_acc
             torch.save(model.state_dict(), f'../ckpt/best_{model.__class__.__name__}.pth')
-            print(f'Saved best model in epoch {epoch}')
+            print(f'Saved best model in epoch {epoch + 1}')
+        val_loss_list.append(val_loss)
 
     # Evaluate on test set
     print('\nTesting...')
     model.load_state_dict(torch.load(f'../ckpt/best_{model.__class__.__name__}.pth'))
-    eval_binary_label_model(model, test_loader, device, 'Test')
+    eval_binary_label_model(model, criterion, test_loader, device, 'Test')
+
+    # Plot loss
+    epochs = range(1, args.epochs + 1)
+    plt.plot(epochs, train_loss_list, 'b', label='Training loss')
+    plt.plot(epochs, val_loss_list, 'r', label='Validation loss')
+    plt.title('Training and validation loss')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.xticks(epochs)
+    plt.legend()
+    plt.savefig(f'../ckpt/{model.__class__.__name__}_loss.png')
+    print(f'Loss plot saved to ../ckpt/{model.__class__.__name__}_loss.png')
 
 
 def get_args():
     parser = argparse.ArgumentParser(description='Train a model on sEEG data')
     parser.add_argument('--batch_size', type=int, default=32, help='Batch size')
     parser.add_argument('--lr', type=float, default=1e-3, help='Learning rate')
-    parser.add_argument('--epochs', type=int, default=50, help='Number of epochs')
+    parser.add_argument('--epochs', type=int, default=100, help='Number of epochs')
     parser.add_argument('--seed', type=int, default=42, help='Random seed')
     args = parser.parse_args()
     return args

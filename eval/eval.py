@@ -2,11 +2,13 @@ import torch
 from sklearn.metrics import f1_score, precision_score, recall_score, hamming_loss
 
 
-def eval_binary_label_model(model, data_loader, device, split):
+def eval_binary_label_model(model, criterion, data_loader, device, split):
     model.eval()
 
     total = 0
     correct = 0
+
+    total_loss = 0
 
     with torch.no_grad():
         for seeg, label in data_loader:
@@ -15,6 +17,10 @@ def eval_binary_label_model(model, data_loader, device, split):
             # Forward
             pred = model(seeg)
 
+            # Compute loss
+            loss = criterion(pred, label)
+            total_loss += loss.item()
+
             # Convert predictions to binary
             pred_bin = (pred > 0.5).int()
 
@@ -22,10 +28,14 @@ def eval_binary_label_model(model, data_loader, device, split):
             total += label.shape[0]
             correct += (pred_bin == label).sum().item()
 
+    # Compute average loss
+    avg_loss = total_loss / len(data_loader)
+    print(f'{split} average loss per batch: {avg_loss:.3f}')
+
     # Compute accuracy
     acc = correct / total
     print(f'{split} accuracy: {acc * 100:.2f}%')
-    return acc
+    return acc, avg_loss
 
 
 def eval_multi_label_model(model, data_loader, device, split):
