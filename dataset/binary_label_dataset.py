@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 
 
 class BinaryLabelDataset(Dataset):
-    def __init__(self, seeg_file='../data/seeg.npy', label_file='../data/presence_of_faces/seconds_with_Tony0.npy',
+    def __init__(self, seeg_file='../data/downsampled_seeg.npy', label_file='../data/presence_of_faces/seconds_with_Tony0.npy',
                  split='train', train_ratio=0.7, test_ratio=0.15):
         super(BinaryLabelDataset).__init__()
         self.split = split
@@ -15,16 +15,14 @@ class BinaryLabelDataset(Dataset):
         seeg_data = np.load(seeg_file).transpose(1, 0)
         label_data = np.load(label_file)
 
-        # The valid time is the minimum of time in seconds of the sEEG data and the label data
-        valid_time = min(int(seeg_data.shape[0] / 1024), label_data.shape[0])
-
         # Truncate the data
-        seeg_data = seeg_data[:valid_time * 1024, :].reshape(-1, 84, 1024)  # Reshape to (valid_time, 84, 1024)
-        label_data = label_data[:valid_time]    # Reshape to (valid_time,)
+        valid_frame = min(int(seeg_data.shape[0] / 3), label_data.shape[0])
+        seeg_data = seeg_data[:valid_frame * 3, :].reshape(-1, 84, 3)  # Reshape to (valid_frame, 84, 3)
+        label_data = label_data[:valid_frame]    # Reshape to (valid_time,)
 
         # Compute the number of samples for train and test+val
-        train_num = int(valid_time * train_ratio)
-        test_val_num = valid_time - train_num
+        train_num = int(valid_frame * train_ratio)
+        test_val_num = valid_frame - train_num
 
         # Stratified split for train and test+val
         seeg_train, seeg_test_val, label_train, label_test_val = train_test_split(
@@ -60,15 +58,15 @@ class BinaryLabelDataset(Dataset):
 
 
 if __name__ == "__main__":
-    seeg_file = '../data/seeg.npy'
-    label_file = '../data/presence_of_faces/seconds_with_Tony0.npy'
+    seeg_file = '../data/downsampled_seeg.npy'
+    label_file = '../data/new_presence_of_faces/frames_with_Tony.npy'
 
     dataset = BinaryLabelDataset(seeg_file=seeg_file, label_file=label_file, split='train')
 
     print("Checking the shape of the data...")
     for idx in range(len(dataset)):
         data = dataset[idx]
-        assert data[0].shape == (84, 1024), "The sEEG data must be of shape (84, 1024)"
+        assert data[0].shape == (84, 3), "The sEEG data must be of shape (84, 3)"
         assert data[1].shape == (1,), "The label must be of shape (1,)"
     print("The shape of the data is correct")
 
@@ -78,14 +76,14 @@ if __name__ == "__main__":
     print(f'Number of positive samples: {num_pos}')
     print(f'Number of negative samples: {num_neg}')
 
-    dataset = BinaryLabelDataset(split='val')
+    dataset = BinaryLabelDataset(seeg_file=seeg_file, label_file=label_file, split='val')
     labels = dataset.label_data
     num_pos = np.sum(labels)
     num_neg = len(labels) - num_pos
     print(f'Number of positive samples: {num_pos}')
     print(f'Number of negative samples: {num_neg}')
 
-    dataset = BinaryLabelDataset(split='test')
+    dataset = BinaryLabelDataset(seeg_file=seeg_file, label_file=label_file, split='test')
     labels = dataset.label_data
     num_pos = np.sum(labels)
     num_neg = len(labels) - num_pos
