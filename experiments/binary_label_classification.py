@@ -14,12 +14,12 @@ from utils.model import set_seeds
 def main(args):
     # Create datasets
     print('Initializing datasets...')
-    seeg_file = '../data/seeg.npy'
-    label_file = '../data/presence_of_faces/seconds_with_Tony0.npy'
+    seeg_file = '../data/downsampled_seeg.npy'
+    label_file = '../data/new_presence_of_faces/frames_with_Tony.npy'
     train_ratio = 0.7
     test_ratio = 0.15
-    train_dataset = BinaryLabelDataset(seeg_file=seeg_file, label_file=label_file, split='train', train_ratio=train_ratio,
-                                       test_ratio=test_ratio)
+    train_dataset = BinaryLabelDataset(seeg_file=seeg_file, label_file=label_file, split='train',
+                                       train_ratio=train_ratio, test_ratio=test_ratio)
     val_dataset = BinaryLabelDataset(seeg_file=seeg_file, label_file=label_file, split='val', train_ratio=train_ratio,
                                      test_ratio=test_ratio)
     test_dataset = BinaryLabelDataset(seeg_file=seeg_file, label_file=label_file, split='test', train_ratio=train_ratio,
