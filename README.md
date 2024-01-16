@@ -1,17 +1,8 @@
-# Decoding Presence of Tony from sEEG Recordings
+# Decoding the Presence of Tony from sEEG Recordings
 
 ## Project Overview
 
-In this tutorial, we delve into the principles of stereoencephalography (sEEG) data decoding with a practical, hands-on approach. Our challenge involves a binary classification task: using one-second sEEG recordings to determine whether Tony, a character from 'Greenbook', is present in the scene. This task is designed to provide a straightforward yet informative introduction to sEEG decoding.
-
-
-
-## Methods
-
-Our classification task is approached using two primary machine learning models:
-
-1. **Fully Connected Neural Network (FCNN):** Achieved a testing accuracy of 63.34%, using a data split of 70% for training, 15% for validation, and 15% for testing.
-2. **Support Vector Machines (SVMs):** With a polynomial kernel and C=0.001, this model reached our highest accuracy of 67.24%. The data was similarly split, with 70% used for training and 15% for testing.
+In this tutorial, we explore the principles of stereoencephalography (sEEG) data decoding through a practical, hands-on approach. Our objective is a binary classification task: determining the presence of Tony, a character from 'Greenbook', in a movie frame, using sEEG recordings. This project serves as an insightful introduction to the basics of sEEG decoding.
 
 
 
@@ -28,27 +19,36 @@ The dataset for this tutorial has been pre-processed and is ready for use. Downl
 
 
 
+## Methods & Results
+
+Our classification task is approached using two primary machine learning models:
+
+1. **Fully Connected Neural Network (FCNN):** Achieving a testing accuracy of 80.34% (chance level: 61.19%), with a data split of 70% training, 15% validation, and 15% testing. Below is the training and validation loss graph. ![BinaryLabelFCNN_loss](.\BinaryLabelFCNN_loss.png)
+2. **Support Vector Machines (SVMs):** With the same dataset, this model, using a polynomial kernel and C=0.001, attained the highest accuracy of 67.24%.
+
 ## Code Organization
 
-This repository is organized to facilitate easy navigation and understanding of our machine learning pipelines for the Fully Connected Neural Network (FCNN) using PyTorch, and Support Vector Machines (SVMs) using Scipy.
+The repository is organized into two distinct pipelines: a PyTorch pipeline for the Fully Connected Neural Network (FCNN) and a Scipy pipeline for Support Vector Machines (SVMs).
 
 ### PyTorch Pipeline for FCNN
 
-- `main.py`: This script includes the core training and testing logic for the FCNN model.
+- `/experiments`:
+  - `binary_label_classification.py`: Core training and testing logic for the FCNN model.
+
 - `/dataset`:
-  - `/dataset.py`: Defines the custom dataset class for use in the PyTorch pipeline.
+  - `/binary_label_dataset.py`: Custom dataset class for the binary classification task.
 - `/eval`:
-  - `/eval.py`: Contains the evaluation functions used during the validation and testing phases in the PyTorch pipeline.
+  - `/eval.py`: Evaluation function used in validation and testing.
 - `/models`:
-  - `fcnn.py`: Houses the architecture definition of the FCNN model.
+  - `binary_label_fcnn.py`: Architecture definition of the FCNN model for the binary classification task.
 - `/train`:
-  - `train.py`: Implements the training procedures specific to the FCNN in the PyTorch pipeline.
-- `/utils`: Contains utility scripts aiding in various tasks.
-  - `data.py`: Manages preprocessing steps for the dataset.
-  - `model.py`: Includes utility functions for model operations.
+  - `train.py`: Training procedures specific to the FCNN in PyTorch.
+- `/utils`: Various utility scripts.
+  - `data.py`: Dataset preprocessing management.
+  - `model.py`: Model operation utilities.
 
 ### Scipy Pipeline for SVMs
 
 - `/svm`:
-  - `svm_demo.ipynb`: A Jupyter Notebook demonstrating the implementation and usage of SVMs within the Scipy framework.
+  - `svm_demo.ipynb`: A Jupyter Notebook demonstrating SVM implementation and usage within the Scipy framework.
 
