@@ -241,13 +241,24 @@ def get_unique_characters(xml_files):
     return characters
 
 
+# Function to create a list indicating which seconds contain Tony
+def create_frames_with_character_array(frames_list,total_frames ):
+    # Create a dictionary to count frames of Tony in each second
+
+    frames_with_character_list = [0] * total_frames  
+    for  frame in frames_list:
+        frames_with_character_list[frame] =1
+    
+       
+    frames_with_character_array= np.array(frames_with_character_list)
+    return   frames_with_character_array
 if __name__ == "__main__":
     # seeg = preprocess_seeg()
     # np.save("../data/seeg.npy", seeg)
     #
     # # Video frame length and frames per second
-    # total_frames = 234267
-    # frames_per_second = 30
+    total_frames = 234267
+    frames_per_second = 30
     #
     # # List of frame numbers that contain the character Tony
     # frames_with_tony = create_tony_frames()
@@ -255,22 +266,21 @@ if __name__ == "__main__":
     # seconds_with_tony_array = seconds_with_tony(frames_with_tony, 30)
     # np.save("../data/seconds_with_tony.npy", seconds_with_tony_array)
 
-    # xml_files=getXMLfiles()
-    #
-    # # Get unique characters from the XML files
-    # unique_characters = get_unique_characters(xml_files)
-    # unique_characters_count = len(unique_characters)
-    #
-    # for char in unique_characters:
-    #     print(char)
-    #
-    #     # List of frame numbers that contain the character
-    #     frames_with_character = create_character_frames(char)
-    #     # Call the modified function with the combined list of frames
-    #     modified_seconds_with_character = seconds_with_character(frames_with_character,30,0)
-    #     modified_seconds_with_character[980:1000]  # Displaying the first 10 seconds as an example
-    #
-    #     np.save("seconds_with_"+char+"0.npy", modified_seconds_with_character )
+    xml_files=getXMLfiles()
+    
+    # Get unique characters from the XML files
+    unique_characters = get_unique_characters(xml_files)
+    unique_characters_count = len(unique_characters)
+    
+    for char in unique_characters:
+        print(char)
+    
+        # List of frame numbers that contain the character
+        frames_with_character = create_character_frames(char,total_frames)
+        # Call the modified function with the combined list of frames
+        modified_seconds_with_character =create_frames_with_character_array(frames_with_character)
+
+        np.save("seconds_with_"+char+"0.npy", modified_seconds_with_character )
 
     from dataset.multi_label_dataset import MultiLabelDataset
     seeg_file = '../data/seeg.npy'
