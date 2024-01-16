@@ -7,6 +7,7 @@ import numpy as np
 import cv2
 import xml.etree.ElementTree as ET
 
+from scipy import signal
 
 def preprocess_seeg():
     chapter_start_end_timestep = get_start_end_timestep_4_chapters()
@@ -253,8 +254,21 @@ def create_frames_with_character_array(frames_list,total_frames ):
     frames_with_character_array= np.array(frames_with_character_list)
     return   frames_with_character_array
 if __name__ == "__main__":
-    # seeg = preprocess_seeg()
-    # np.save("../data/seeg.npy", seeg)
+    seeg = preprocess_seeg()
+
+    original_samples=len(seeg[1])
+    new_rate=90
+    original_rate =1024
+    data = seeg.transpose(1, 0)
+
+    # Calculate the new number of samples
+    new_samples = int(original_samples * new_rate / original_rate)
+
+    # Assuming your data is in an ndarray named 'data'
+    # Perform the downsampling
+    downsampled_data = signal.resample(data, new_samples)
+    #Save the data
+    # np.save("../data/seeg.npy", downsampled_data )
     #
     # # Video frame length and frames per second
     total_frames = 234267
