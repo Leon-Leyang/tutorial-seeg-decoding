@@ -23,7 +23,7 @@ The dataset for this tutorial has been pre-processed and is ready for use. Downl
 
 Our classification task is approached using two primary machine learning models:
 
-1. **Fully Connected Neural Network (FCNN):** Achieving a testing accuracy of 80.34% (chance level: 61.19%), with a data split of 70% training, 15% validation, and 15% testing. Below is the training and validation loss graph. ![BinaryLabelFCNN_loss](.\BinaryLabelFCNN_loss.png)
+1. **Fully Connected Neural Network (FCNN):** Achieving a testing accuracy of 80.34% (chance level: 61.19%), with a data split of 70% training, 15% validation, and 15% testing. Below is the training and validation loss graph. ![BinaryLabelFCNN_loss](./BinaryLabelFCNN_loss.png)
 2. **Support Vector Machines (SVMs):** With the same dataset, this model, using a polynomial kernel and C=0.001, attained the highest accuracy of 67.24%.
 
 ## Code Organization
