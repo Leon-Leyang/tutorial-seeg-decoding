@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 
 
 class BinaryLabelDataset(Dataset):
-    def __init__(self, seeg_file='../data/downsampled_seeg.npy', label_file='../data/presence_of_faces/seconds_with_Tony0.npy',
+    def __init__(self, seeg_file='../data/downsampled_seeg.npy', label_file='../data/seconds_with_Tony2010.npy',
                  split='train', train_ratio=0.7, test_ratio=0.15):
         super(BinaryLabelDataset).__init__()
         self.split = split
@@ -15,14 +15,19 @@ class BinaryLabelDataset(Dataset):
         seeg_data = np.load(seeg_file).transpose(1, 0)
         label_data = np.load(label_file)
 
-        # Truncate the data
-        valid_frame = min(int(seeg_data.shape[0] / 3), label_data.shape[0])
-        seeg_data = seeg_data[:valid_frame * 3, :].reshape(-1, 84, 3)  # Reshape to (valid_frame, 84, 3)
-        label_data = label_data[:valid_frame]    # Reshape to (valid_time,)
+        # Truncate the unmatched data
+        valid_second = min(int(seeg_data.shape[0] / 90), label_data.shape[0])
+        seeg_data = seeg_data[:valid_second * 90, :].reshape(-1, 84, 90)  # Reshape to (valid_second, 84, 90)
+        label_data = label_data[:valid_second]    # Reshape to (valid_second,)
+
+        # Truncate the data where the label is -1
+        seeg_data = seeg_data[label_data != -1, :, :]
+        label_data = label_data[label_data != -1]
 
         # Compute the number of samples for train and test+val
-        train_num = int(valid_frame * train_ratio)
-        test_val_num = valid_frame - train_num
+        total_sample_num = seeg_data.shape[0]
+        train_num = int(total_sample_num * train_ratio)
+        test_val_num = total_sample_num - train_num
 
         # Stratified split for train and test+val
         seeg_train, seeg_test_val, label_train, label_test_val = train_test_split(
@@ -59,14 +64,14 @@ class BinaryLabelDataset(Dataset):
 
 if __name__ == "__main__":
     seeg_file = '../data/downsampled_seeg.npy'
-    label_file = '../data/new_presence_of_faces/frames_with_Tony.npy'
+    label_file = '../data/seconds_with_Tony2010.npy'
 
     dataset = BinaryLabelDataset(seeg_file=seeg_file, label_file=label_file, split='train')
 
     print("Checking the shape of the data...")
     for idx in range(len(dataset)):
         data = dataset[idx]
-        assert data[0].shape == (84, 3), "The sEEG data must be of shape (84, 3)"
+        assert data[0].shape == (84, 90), "The sEEG data must be of shape (84, 3)"
         assert data[1].shape == (1,), "The label must be of shape (1,)"
     print("The shape of the data is correct")
 
