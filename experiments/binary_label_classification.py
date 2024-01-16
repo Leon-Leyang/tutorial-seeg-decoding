@@ -80,7 +80,7 @@ def main(args):
     plt.title('Training and validation loss')
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
-    plt.xticks(epochs)
+    plt.xticks(range(1, args.epochs + 1, 10))
     plt.legend()
     plt.savefig(f'../ckpt/{model.__class__.__name__}_loss.png')
     print(f'Loss plot saved to ../ckpt/{model.__class__.__name__}_loss.png')
@@ -90,7 +90,7 @@ def get_args():
     parser = argparse.ArgumentParser(description='Train a model on sEEG data')
     parser.add_argument('--batch_size', type=int, default=32, help='Batch size')
     parser.add_argument('--lr', type=float, default=1e-3, help='Learning rate')
-    parser.add_argument('--epochs', type=int, default=100, help='Number of epochs')
+    parser.add_argument('--epochs', type=int, default=200, help='Number of epochs')
     parser.add_argument('--seed', type=int, default=42, help='Random seed')
     args = parser.parse_args()
     return args
