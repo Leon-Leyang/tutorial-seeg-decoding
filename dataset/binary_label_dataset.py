@@ -24,10 +24,6 @@ class BinaryLabelDataset(Dataset):
         seeg_data = seeg_data[label_data != -1, :, :]
         label_data = label_data[label_data != -1]
 
-        # Truncate the data where the label is -1
-        seeg_data = seeg_data[label_data != -1, :, :]
-        label_data = label_data[label_data != -1]
-
         # Balance the dataset to have an equal number of positive and negative samples
         positive_indices = np.where(label_data == 1)[0]
         negative_indices = np.where(label_data == 0)[0]
