@@ -18,7 +18,7 @@ def main(args):
     # Create datasets
     print('Initializing datasets...')
     seeg_file = '../data/downsampled_seeg.npy'
-    label_file = '../data/seconds_with_Tony30.npy'
+    label_file = '../data/seconds_with_Tony200.npy'
     train_ratio = 0.7
     test_ratio = 0.15
     train_dataset = BinaryLabelDataset(seeg_file=seeg_file, label_file=label_file, split='train',
