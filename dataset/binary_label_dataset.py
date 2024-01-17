@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 
 
 class BinaryLabelDataset(Dataset):
-    def __init__(self, seeg_file='../data/downsampled_seeg.npy', label_file='../data/seconds_with_Tony2010.npy',
+    def __init__(self, seeg_file='../data/downsampled_seeg.npy', label_file='../data/seconds_with_Tony30.npy',
                  split='train', train_ratio=0.7, test_ratio=0.15):
         super(BinaryLabelDataset).__init__()
         self.split = split
@@ -64,7 +64,7 @@ class BinaryLabelDataset(Dataset):
 
 if __name__ == "__main__":
     seeg_file = '../data/downsampled_seeg.npy'
-    label_file = '../data/seconds_with_Tony2010.npy'
+    label_file = '../data/seconds_with_Tony30.npy'
 
     dataset = BinaryLabelDataset(seeg_file=seeg_file, label_file=label_file, split='train')
 
