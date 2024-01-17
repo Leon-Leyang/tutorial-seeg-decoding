@@ -24,6 +24,23 @@ class BinaryLabelDataset(Dataset):
         seeg_data = seeg_data[label_data != -1, :, :]
         label_data = label_data[label_data != -1]
 
+        # Truncate the data where the label is -1
+        seeg_data = seeg_data[label_data != -1, :, :]
+        label_data = label_data[label_data != -1]
+
+        # Balance the dataset to have an equal number of positive and negative samples
+        positive_indices = np.where(label_data == 1)[0]
+        negative_indices = np.where(label_data == 0)[0]
+
+        minority_size = min(len(positive_indices), len(negative_indices))
+        balanced_indices = np.concatenate([
+            np.random.choice(positive_indices, minority_size, replace=False),
+            np.random.choice(negative_indices, minority_size, replace=False)
+        ])
+
+        seeg_data = seeg_data[balanced_indices, :, :]
+        label_data = label_data[balanced_indices]
+
         # Compute the number of samples for train and test+val
         total_sample_num = seeg_data.shape[0]
         train_num = int(total_sample_num * train_ratio)
@@ -31,7 +48,7 @@ class BinaryLabelDataset(Dataset):
 
         # Stratified split for train and test+val
         seeg_train, seeg_test_val, label_train, label_test_val = train_test_split(
-            seeg_data, label_data, train_size=train_num, random_state=42, stratify=label_data)
+            seeg_data, label_data, train_size=train_num, random_state=10, stratify=label_data)
 
         # Further split test+val into test and val
         test_num = int(test_val_num * (test_ratio / (1 - train_ratio)))

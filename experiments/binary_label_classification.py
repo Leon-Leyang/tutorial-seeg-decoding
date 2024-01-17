@@ -89,8 +89,8 @@ def main(args):
 def get_args():
     parser = argparse.ArgumentParser(description='Train a model on sEEG data')
     parser.add_argument('--batch_size', type=int, default=32, help='Batch size')
-    parser.add_argument('--lr', type=float, default=1e-3, help='Learning rate')
-    parser.add_argument('--epochs', type=int, default=10, help='Number of epochs')
+    parser.add_argument('--lr', type=float, default=1e-4, help='Learning rate')
+    parser.add_argument('--epochs', type=int, default=100, help='Number of epochs')
     parser.add_argument('--seed', type=int, default=42, help='Random seed')
     args = parser.parse_args()
     return args
